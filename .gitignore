@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build Output
+dist/
+build/
+*.tsbuildinfo
+out/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.sublime-project
+.sublime-workspace
+*.code-workspace
+*.iml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# # Prisma
+# prisma/dev.db
+# prisma/dev.db-journal
+# .prisma/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+
+# Temporary & Cache Files
+tmp/
+temp/
+*.tmp
+.cache/
+.parcel-cache/
+dist/
+
+# IDE
+.vscode-test/
+debugger.log
+
+# Secrets & Sensitive Data
+*.pem
+*.key
+.ssh/
+
+# Backups
+*.bak
+*.backup
+*~
+
+# Installation & Build
+npm-debug.log
+yarn-error.log

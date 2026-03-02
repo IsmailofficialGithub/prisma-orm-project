@@ -1,0 +1,39 @@
+model CurrencyType {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  code         String   @unique
+  kind         String
+  decimals     Int      @default(0)
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  modifiedById String?
+
+  // Relations
+  currencies     Currency[]
+  lootboxes      Lootbox[]
+  orders         Order[]
+  paymentIntents PaymentIntent[]
+  transactions   Transaction[]
+  modifiedBy     Player?         @relation(fields: [modifiedById], references: [id])
+
+  @@map("currency_types")
+}
+
+model Currency {
+  id             String   @id @default(uuid())
+  playerId       String
+  amount         Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  modifiedById   String?
+  currencyTypeId Int
+
+  // Relations
+  player       Player       @relation("CurrencyOwner", fields: [playerId], references: [id], onDelete: Cascade)
+  currencyType CurrencyType @relation(fields: [currencyTypeId], references: [id])
+  modifiedBy   Player?      @relation("CurrencyModifier", fields: [modifiedById], references: [id])
+
+  @@unique([playerId, currencyTypeId])
+  @@map("currencies")
+}

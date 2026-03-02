@@ -1,0 +1,136 @@
+model Match {
+  id                 String   @id @default(uuid())
+  turnOrder          Json[]
+  currentRound       Int      @default(1)
+  currentPlayerTurn  String?
+  playerActionsUsed  Json?
+  heroHp             Json?
+  heroShields        Json?
+  p1_hero_has_shield Boolean  @default(false)
+  p2_hero_has_shield Boolean  @default(false)
+  playerRoundEnergy  Json?
+  p1ActionState      Int      @default(0)
+  p2ActionState      Int      @default(0)
+  playerSkippedTurn  Boolean  @default(false)
+  status             String   @default("active")
+  winner             String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  playerDecks MatchPlayerDeck[]
+  rounds      MatchRound[]
+  summary     MatchSummary?
+
+  @@map("matches")
+}
+
+model MatchPlayerDeck {
+  id             String  @id @default(uuid())
+  matchId        String
+  playerId       String?
+  playerDeckId   String?
+  deckPosition   Int
+  playerPosition String?
+  isAiPlayer     Boolean @default(false)
+  aiPlayerData   Json?
+
+  // Relations
+  match      Match                 @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player     Player?               @relation(fields: [playerId], references: [id])
+  playerDeck Deck?                 @relation(fields: [playerDeckId], references: [id])
+  deckCards  PlayerMatchDeckCard[]
+
+  @@map("match_player_decks")
+}
+
+model PlayerMatchDeckCard {
+  id                String  @id @default(uuid()) @db.VarChar(36)
+  matchPlayerDeckId String  @db.VarChar(36)
+  cardId            Int     @db.Integer
+  cardPosition      Int     @db.Integer
+  isInHand          Boolean @default(false) @db.Boolean
+  isPlayed          Boolean @default(false) @db.Boolean
+  isDestroyed       Boolean @default(false) @db.Boolean
+  hasShield         Boolean @default(false) @db.Boolean
+  shieldHealth      Int?    @db.Integer
+  currentHp         Int?    @db.Integer
+  slotIndex         Int?    @db.Integer
+
+  // Relations
+  card            Card            @relation(fields: [cardId], references: [id])
+  matchPlayerDeck MatchPlayerDeck @relation(fields: [matchPlayerDeckId], references: [id], onDelete: Cascade)
+
+  @@map("player_match_deck_cards")
+}
+
+model MatchRound {
+  id              String    @id @default(uuid())
+  matchId         String
+  roundNumber     Int
+  currentPlayerId String?
+  roundStartTime  DateTime  @default(now())
+  roundEndTime    DateTime?
+
+  // Relations
+  match         Match              @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  currentPlayer Player?            @relation(fields: [currentPlayerId], references: [id])
+  energies      MatchRoundEnergy[]
+  actions       MatchRoundAction[]
+
+  @@map("match_rounds")
+}
+
+model MatchRoundEnergy {
+  id             String  @id @default(uuid())
+  matchRoundId   String
+  playerId       String?
+  playerPosition String?
+  energyAmount   Int     @default(0)
+
+  // Relations
+  matchRound MatchRound @relation(fields: [matchRoundId], references: [id], onDelete: Cascade)
+  player     Player?    @relation(fields: [playerId], references: [id])
+
+  @@map("match_round_energies")
+}
+
+model MatchRoundAction {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  matchRoundId    String   @db.VarChar(36)
+  playerId        String?  @db.VarChar(36)
+  playerPosition  String?  @db.VarChar(20)
+  actionTypeId    Int      @db.Integer
+  targetCardId    Int?     @db.Integer
+  targetHeroId    Int?     @db.Integer
+  actionData      Json?    @db.JsonB
+  actionTimestamp DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relations
+  matchRound MatchRound @relation(fields: [matchRoundId], references: [id], onDelete: Cascade)
+  player     Player?    @relation(fields: [playerId], references: [id])
+  actionType ActionType @relation(fields: [actionTypeId], references: [id])
+  targetCard Card?      @relation(fields: [targetCardId], references: [id])
+  targetHero Hero?      @relation(fields: [targetHeroId], references: [id])
+
+  @@map("match_round_actions")
+}
+
+model MatchSummary {
+  id            String   @id @default(uuid())
+  matchId       String   @unique
+  totalRounds   Int
+  matchDuration Int
+  winCondition  String
+  finalScore    Json?
+  player1XpGain Int      @default(0)
+  player2XpGain Int      @default(0)
+  player1LcGain Int      @default(0)
+  player2LcGain Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  // Relations
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@map("match_summaries")
+}

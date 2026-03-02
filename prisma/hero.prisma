@@ -1,0 +1,13 @@
+model Hero {
+  id        Int    @id @default(autoincrement())
+  name      String @unique
+  factionId Int
+  hp        Int
+
+  // Relations
+  faction         Faction            @relation(fields: [factionId], references: [id])
+  players         Player[]
+  targetedActions MatchRoundAction[]
+
+  @@map("heroes")
+}

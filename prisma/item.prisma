@@ -1,0 +1,35 @@
+model ItemType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations
+  items Item[]
+
+  @@map("item_types")
+}
+
+model Item {
+  id           Int      @id @default(autoincrement())
+  item_type_id Int
+  name         String   @unique
+  description  String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  itemPrices ItemPrice[]
+  itemType   ItemType    @relation(fields: [item_type_id], references: [id])
+
+  @@map("items")
+}
+
+model ItemPrice {
+  id     Int    @id @default(autoincrement())
+  amount Float?
+  itemId Int
+
+  // Relations
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@map("item_prices")
+}

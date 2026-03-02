@@ -1,0 +1,19 @@
+model Order {
+  id             Int      @id @default(autoincrement())
+  lootboxId      Int
+  playerId       String
+  orderStatusId  Int
+  currencyTypeId Int
+  amount         Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  currencyType   CurrencyType    @relation(fields: [currencyTypeId], references: [id])
+  lootbox        Lootbox         @relation(fields: [lootboxId], references: [id])
+  player         Player          @relation(fields: [playerId], references: [id])
+  orderStatus    OrderStatus     @relation(fields: [orderStatusId], references: [id])
+  paymentIntents PaymentIntent[]
+
+  @@map("orders")
+}

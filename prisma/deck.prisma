@@ -1,0 +1,37 @@
+model Deck {
+  id           String   @id @default(uuid())
+  playerId     String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  modifiedById String?
+
+  // Relations
+  cards            DeckCard[]
+  owner            Player            @relation("DeckOwner", fields: [playerId], references: [id], onDelete: Cascade)
+  modifiedBy       Player?           @relation("DeckModifier", fields: [modifiedById], references: [id])
+  matchPlayerDecks MatchPlayerDeck[]
+
+  @@map("decks")
+}
+
+model DeckCard {
+  id                    String   @id @default(uuid())
+  deckId                String
+  player_card_unique_id String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  modifiedById          String?
+  ownerId               String?
+  playerId              String?
+
+  // Relations
+  modifiedBy Player?    @relation("DeckCardModifier", fields: [modifiedById], references: [id])
+  playerCard PlayerCard @relation(fields: [player_card_unique_id], references: [id], onDelete: Cascade)
+  deck       Deck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  owner      Player?    @relation("DeckCardOwner", fields: [ownerId], references: [id])
+  Player     Player?    @relation(fields: [playerId], references: [id])
+
+  @@unique([deckId, player_card_unique_id])
+  @@map("deck_cards")
+}

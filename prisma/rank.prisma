@@ -1,0 +1,28 @@
+model RankTier {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  order     Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ranks Rank[]
+
+  @@map("rank_tiers")
+}
+
+model Rank {
+  id         String   @id @default(uuid())
+  playerId   String
+  achievedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  points     Int      @default(0)
+  rankTierId Int
+
+  // Relations
+  rankTier RankTier @relation(fields: [rankTierId], references: [id])
+  player   Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@map("ranks")
+}

@@ -1,0 +1,97 @@
+// Defines where a reward originated from
+model RewardSourceType {
+  id         String   @id @default(uuid()) @db.Uuid
+  code       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  grants     RewardGrant[]
+
+  @@map("reward_source_type")
+}
+
+// Current lifecycle state of a reward grant
+model RewardGrantState {
+  id         String   @id @default(uuid()) @db.Uuid
+  code       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  grants     RewardGrant[]
+
+  @@map("reward_grant_state")
+}
+
+// A reward grant represents a delivery of rewards to a player
+model RewardGrant {
+  id               String   @id @default(uuid()) @db.Uuid
+  player_id        String
+  source_type_id   String   @db.Uuid
+  source_ref       String?  @db.VarChar(255)
+  state_id         String   @db.Uuid
+  idempotency_key  String   @unique @db.VarChar(255)
+  payload_snapshot Json?
+
+  fulfilled_at     DateTime?
+  claimed_at       DateTime?
+  reversed_at      DateTime?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  source_type      RewardSourceType @relation(fields: [source_type_id], references: [id])
+  state            RewardGrantState @relation(fields: [state_id], references: [id])
+  player           Player           @relation("PlayerRewardGrants", fields: [player_id], references: [id])
+
+  lines            RewardGrantLine[]
+  events           RewardGrantEvent[]
+
+  @@map("reward_grant")
+}
+
+// Individual reward entries inside a grant
+model RewardGrantLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  grant_id         String   @db.Uuid
+  asset_id         String   @db.Uuid
+  quantity         Int
+  package_line_id  String?  @db.Uuid
+  choice_group_id  String?  @db.Uuid
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  grant            RewardGrant @relation(fields: [grant_id], references: [id])
+  asset            RewardAsset @relation(fields: [asset_id], references: [id])
+
+  ledger_entries   PlayerLedgerEntry[]
+
+  @@map("reward_grant_line")
+}
+
+// Types of events that can occur on a reward grant CREATED, FULFILLED, CLAIMED, REVERSED
+model RewardGrantEventType {
+  id         String   @id @default(uuid()) @db.Uuid
+  code       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  events     RewardGrantEvent[]
+
+  @@map("reward_grant_event_type")
+}
+
+// Immutable event log for reward grant actions
+model RewardGrantEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  grant_id        String   @db.Uuid
+  event_type_id   String   @db.Uuid
+  event_at        DateTime @default(now())
+  actor_id        String?  @db.Uuid
+  metadata        Json?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  grant           RewardGrant          @relation(fields: [grant_id], references: [id])
+  event_type      RewardGrantEventType @relation(fields: [event_type_id], references: [id])
+
+  @@map("reward_grant_event")
+}

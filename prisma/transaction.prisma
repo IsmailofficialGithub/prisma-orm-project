@@ -1,0 +1,25 @@
+model Transaction {
+  id              Int               @id @default(autoincrement())
+  paymentIntentId Int
+  wallet          String
+  amount          Int
+  currencyTypeId  Int
+  status          TransactionStatus @default(PENDING)
+  transactionHash String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  currencyType  CurrencyType  @relation(fields: [currencyTypeId], references: [id])
+  paymentIntent PaymentIntent @relation(fields: [paymentIntentId], references: [id])
+
+  @@map("transactions")
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REVERSED
+  CANCELLED
+}

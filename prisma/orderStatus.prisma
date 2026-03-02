@@ -1,0 +1,9 @@
+model OrderStatus {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations
+  orders Order[]
+
+  @@map("order_statuses")
+}

@@ -1,0 +1,59 @@
+model MissionType {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
+  name       String   @db.VarChar(25)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  missions Mission[]
+
+  @@map("mission_types")
+}
+
+model Mission {
+  id                    Int      @id @default(autoincrement()) @db.Integer
+  name                  String   @db.VarChar(30)
+  required_progress     Int      @db.Integer
+  mission_type_id       Int      @db.SmallInt
+  mission_image_type_id Int      @db.SmallInt
+  reward_package_id     String   @db.Uuid  // CHANGED: from bundle_id to reward_package_id, type is UUID
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  // Relations
+  mission_type       MissionType             @relation(fields: [mission_type_id], references: [id])
+  mission_image_type MissionImageType        @relation(fields: [mission_image_type_id], references: [id])
+  player_progress    PlayerMissionProgress[]
+  reward_package     RewardPackage           @relation(fields: [reward_package_id], references: [id])  // CHANGED: from bundle to reward_package
+
+  @@map("missions")
+}
+
+model PlayerMissionProgress {
+  player_id  String
+  mission_id Int      @db.Integer
+  progress   Int      @db.Integer
+  completed  Boolean  @default(false)
+  claimed    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  player  Player  @relation("PlayerMissions", fields: [player_id], references: [id], onDelete: Cascade)
+  mission Mission @relation(fields: [mission_id], references: [id])
+
+  @@id([player_id, mission_id])
+  @@map("player_missions_progress")
+}
+
+model MissionImageType {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
+  name       String   @db.VarChar(25)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  missions Mission[]
+
+  @@map("mission_image_types")
+}

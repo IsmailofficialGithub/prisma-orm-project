@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "public"."players" ADD COLUMN     "lastLoginDate" TIMESTAMP(3),
+ADD COLUMN     "loginStreakDays" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "matchesPlayed" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "matchesWon" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "seasonXp" INTEGER NOT NULL DEFAULT 0;

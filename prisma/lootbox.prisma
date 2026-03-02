@@ -1,0 +1,44 @@
+model LootboxType {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  lootboxes Lootbox[]
+
+  @@map("lootbox_types")
+}
+
+model Lootbox {
+  id               Int      @id @default(autoincrement())
+  name             String   @unique
+  description      String?  @db.VarChar(100)
+  cost             Int      @default(0)
+  lootbox_type_id  Int
+  currency_type_id Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  lootboxRarities LootboxRarity[]
+  currencyType    CurrencyType    @relation(fields: [currency_type_id], references: [id])
+  lootboxType     LootboxType     @relation(fields: [lootbox_type_id], references: [id])
+  orders          Order[]
+
+  @@map("lootboxes")
+}
+
+model LootboxRarity {
+  id        Int    @id @default(autoincrement())
+  lootboxId Int
+  rarityId  Int
+  dropRate  Float?
+
+  // Relations
+  lootbox Lootbox @relation(fields: [lootboxId], references: [id])
+  rarity  Rarity  @relation(fields: [rarityId], references: [id])
+
+  @@unique([lootboxId, rarityId])
+  @@map("lootbox_rarities")
+}

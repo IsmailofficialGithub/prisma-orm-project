@@ -1,0 +1,48 @@
+model MatchConfig {
+  id                   Int      @id @default(autoincrement())
+  maxDeckCardsCount    Int      @default(10)
+  maxHandCount         Int      @default(3)
+  maxSlotCount         Int      @default(5)
+  turnTimer            Int      @default(30)
+  shieldHealth         Int      @default(2)
+  default_round_energy Int      @default(1)
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  preparations MatchPreparation[]
+
+  @@map("match_configs")
+}
+
+model MatchRoundEnergyConfig {
+  id         Int      @id @default(autoincrement())
+  round      Int      @unique
+  energy_t1  Int      @default(1)
+  energy_t2  Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("match_round_energy_config")
+}
+
+model MatchPreparation {
+  id            String   @id @default(uuid())
+  configId      Int
+  playerId      String
+  aiPlayerId    String
+  firstTurn     String
+  playerFaction Int
+  aiFaction     Int
+  status        String   @default("prepared") // "prepared", "started", "expired" // TODO: Enum?
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  config MatchConfig @relation(fields: [configId], references: [id])
+  player Player      @relation("MatchPreparations", fields: [playerId], references: [id])
+
+  @@map("match_preparations")
+}

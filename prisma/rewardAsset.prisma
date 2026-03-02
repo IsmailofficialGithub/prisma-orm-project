@@ -1,0 +1,82 @@
+// Asset type reference table
+model RewardAssetType {
+  id         String   @id @default(uuid()) @db.Uuid
+  code       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  assets     RewardAsset[]
+
+  @@map("reward_asset_type")
+}
+
+// Core asset table,  Holds shared fields for every reward, regardless of its type
+model RewardAsset {
+  id            String   @id @default(uuid()) @db.Uuid
+  asset_type_id String   @db.Uuid
+  code          String   @unique @db.VarChar(100)
+  display_name  String   @db.VarChar(255)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  details_currency RewardAssetCurrency?
+  details_xp       RewardAssetXp?
+  details_card     RewardAssetCard?
+  details_lootbox  RewardAssetLootbox?
+
+  asset_type     RewardAssetType       @relation(fields: [asset_type_id], references: [id])
+  package_lines  RewardPackageLine[]
+  grant_lines    RewardGrantLine[]
+  ledger_entries PlayerLedgerEntry[]
+
+  @@map("reward_asset")
+}
+
+// Currency-specific asset data (e.g. gold, gems)
+model RewardAssetCurrency {
+  asset_id    String   @id @db.Uuid
+  currency_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  asset RewardAsset @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@map("reward_asset_currency")
+}
+
+// XP-specific asset data
+model RewardAssetXp {
+  asset_id    String   @id @db.Uuid
+  code        String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  asset RewardAsset @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@map("reward_asset_xp")
+}
+
+// Card-specific asset data
+model RewardAssetCard {
+  asset_id    String   @id @db.Uuid
+  card_id     Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  asset RewardAsset @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@map("reward_asset_card")
+}
+
+// Lootbox-specific asset data
+model RewardAssetLootbox {
+  asset_id         String   @id @db.Uuid
+  lootbox_type_id  Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  asset RewardAsset @relation(fields: [asset_id], references: [id], onDelete: Cascade)
+
+  @@map("reward_asset_lootbox")
+}

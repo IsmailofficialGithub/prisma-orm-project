@@ -1,0 +1,46 @@
+model Reward {
+  id             Int      @id @default(autoincrement()) @db.Integer
+  reward_type_id Int      @db.SmallInt
+  amount         Int      @db.Integer
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  reward_type    RewardType     @relation(fields: [reward_type_id], references: [id])
+  bundle_rewards BundleReward[]
+
+  @@map("rewards")
+}
+
+model RewardType {
+  id         Int      @id @db.SmallInt
+  name       String   @db.VarChar(25)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  rewards Reward[]
+
+  @@map("reward_types")
+}
+
+model Bundle {
+  id         Int      @id @default(autoincrement()) @db.Integer
+  name       String?  @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  bundle_rewards BundleReward[]
+  
+  @@map("bundles")
+}
+
+model BundleReward {
+  reward_id  Int      @db.Integer
+  bundle_id  Int      @db.Integer
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  reward Reward @relation(fields: [reward_id], references: [id])
+  bundle Bundle @relation(fields: [bundle_id], references: [id])
+
+  @@id([reward_id, bundle_id])
+  @@map("bundle_rewards")
+}

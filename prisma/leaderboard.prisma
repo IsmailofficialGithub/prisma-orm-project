@@ -1,0 +1,30 @@
+model Leaderboard {
+  id               String   @id @default(uuid())
+  playerId         String
+  currentPosition  Int
+  previousPosition Int
+  username         String
+  factionId        Int
+  topCards         Int[] // Array of card identifiers
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  player  Player  @relation("PlayerLeaderboard", fields: [playerId], references: [id], onDelete: Cascade)
+  faction Faction @relation("LeaderboardFaction", fields: [factionId], references: [id])
+
+  // Constraints
+  @@unique([playerId])
+  @@index([currentPosition])
+  @@index([factionId])
+  @@map("leaderboard")
+}
+
+model LeaderboardType {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
+  name       String   @db.VarChar(25)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("leaderboard_types")
+}

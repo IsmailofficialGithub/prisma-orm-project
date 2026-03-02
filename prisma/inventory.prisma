@@ -1,0 +1,17 @@
+model PlayerInventory {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  playerId     String   @db.VarChar(36)
+  cardId       Int      @db.Integer
+  quantity     Int      @default(1) @db.Integer
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  modifiedById String?  @db.VarChar(36)
+
+  // Relations
+  card       Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  owner      Player  @relation("PlayerInventoryOwner", fields: [playerId], references: [id], onDelete: Cascade)
+  modifiedBy Player? @relation("PlayerInventoryModifier", fields: [modifiedById], references: [id])
+
+  @@unique([playerId, cardId])
+  @@map("player_inventories")
+}

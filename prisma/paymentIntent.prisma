@@ -1,0 +1,26 @@
+model PaymentIntent {
+  id                Int                 @id @default(autoincrement())
+  orderId           Int
+  status            PaymentIntentStatus @default(PENDING)
+  idempotencyKey    String?             @unique @db.VarChar(255)
+  amount            Float
+  currencyTypeId    Int
+  providerReference String              @db.VarChar(255)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  // Relations
+  currencyType CurrencyType  @relation(fields: [currencyTypeId], references: [id])
+  order        Order         @relation(fields: [orderId], references: [id])
+  transactions Transaction[]
+
+  @@map("payment_intents")
+}
+
+enum PaymentIntentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REQUIRES_ACTION
+}

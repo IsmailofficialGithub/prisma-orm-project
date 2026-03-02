@@ -1,0 +1,38 @@
+// Type definitions
+enum MatchOutcome {
+  WIN
+  LOSS
+  DRAW
+}
+
+// Models
+model MatchOutcomeEvent {
+  id              String       @id @default(uuid()) @db.VarChar(36)
+  match_id        String       @db.VarChar(36)
+  player_id       String       @db.VarChar(36)
+  match_outcome   MatchOutcome
+  finishing_round Int          @db.Integer
+  created_at      DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime     @updatedAt @db.Timestamptz(6)
+
+  @@index([finishing_round])
+  @@index([player_id, match_outcome])
+  @@map("match_outcome_events")
+}
+
+model MatchShieldedHitEvent {
+  id                      String   @id @default(uuid()) @db.VarChar(36)
+  match_id                String   @db.VarChar(36)
+  match_round_id          String?  @db.VarChar(36)
+  round_number            Int      @db.Integer
+  attacker_player_card_id String?  @db.VarChar(36)
+  target_player_card_id   String?  @db.VarChar(36)
+  target_hero_id          Int?     @db.Integer
+  damage_taken_amount     Int      @db.Integer
+  shield_absorbed         Int?     @db.Integer
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([match_id, round_number])
+  @@map("match_shielded_hit_events")
+}

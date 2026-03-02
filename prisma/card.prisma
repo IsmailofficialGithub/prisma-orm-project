@@ -1,0 +1,115 @@
+model Faction {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cards        Card[]
+  heroes       Hero[]
+  players      Player[]      @relation("PlayerFaction")
+  leaderboards Leaderboard[] @relation("LeaderboardFaction")
+  modifiedById String?
+  modifiedBy   Player?       @relation(fields: [modifiedById], references: [id])
+
+  @@map("factions")
+}
+
+model CardType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cards        Card[]
+  modifiedById String?
+  modifiedBy   Player? @relation(fields: [modifiedById], references: [id])
+
+  @@map("card_types")
+}
+
+model Stage {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  modifiedById String?
+
+  // Relations
+  modifiedBy Player? @relation(fields: [modifiedById], references: [id])
+  cards      Card[]
+
+  @@map("stages")
+}
+
+model Card {
+  id           Int      @id @db.Integer
+  character_id Int      @db.Integer
+  name         String   @db.VarChar(100)
+  description  String?  @db.VarChar(100)
+  lore         String?  @db.VarChar(10000)
+  attack       Int      @db.Integer
+  cost         Int      @db.Integer
+  hp           Int      @db.Integer
+  factionId    Int      @db.Integer
+  isToken      Boolean  @default(false) @db.Boolean
+  stageId      Int      @db.Integer
+  typeId       Int      @db.Integer
+  rarityId     Int?     @db.Integer
+  edition_id   Int?     @db.Integer
+  modifiedById String?  @db.VarChar(36)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  // Relations
+  rarity          Rarity?               @relation(fields: [rarityId], references: [id])
+  faction         Faction               @relation(fields: [factionId], references: [id])
+  stage           Stage                 @relation(fields: [stageId], references: [id])
+  cardType        CardType              @relation(fields: [typeId], references: [id])
+  inventories     PlayerInventory[]
+  modifiedBy      Player?               @relation(fields: [modifiedById], references: [id])
+  PlayerCard      PlayerCard[]
+  matchDeckCards  PlayerMatchDeckCard[]
+  targetedActions MatchRoundAction[]
+  cardEditionType CardEditionType?      @relation(fields: [edition_id], references: [id])
+  cardCharacter   CardCharacter         @relation(fields: [character_id], references: [id])
+
+  @@map("cards")
+}
+
+model CardAcquisitionType {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  playerCards PlayerCard[]
+
+  @@map("card_acquisition_types")
+}
+
+model CardEditionType {
+  id         Int      @id @db.Integer
+  name       String   @unique @db.VarChar(30)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  cards Card[]
+
+  @@map("card_edition_types")
+}
+
+model CardCharacter {
+  id         Int      @id @db.Integer
+  name       String   @unique @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  cards Card[]
+
+  @@map("card_characters")
+}

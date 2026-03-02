@@ -1,0 +1,10 @@
+model Rarity {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations
+  lootboxRarities LootboxRarity[]
+  cards           Card[]
+
+  @@map("rarities")
+}

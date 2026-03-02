@@ -1,0 +1,45 @@
+model CardDamageEvent {
+  id                      String   @id @default(uuid()) @db.VarChar(36)
+  match_id                String   @db.VarChar(36)
+  match_round_id          String?  @db.VarChar(36)
+  attacker_player_card_id String   @db.VarChar(36)
+  target_player_card_id   String?  @db.VarChar(36)
+  target_hero_id          Int?     @db.Integer
+  damage_amount           Int      @db.Integer
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([match_id, attacker_player_card_id])
+  @@index([attacker_player_card_id])
+  @@map("card_damage_events")
+}
+
+model CardRoundDamageEvent {
+  id                      String   @id @default(uuid()) @db.VarChar(36)
+  match_id                String   @db.VarChar(36)
+  match_round_id          String?  @db.VarChar(36)
+  round_number            Int      @db.Integer
+  attacker_player_card_id String   @db.VarChar(36)
+  damage_amount           Int      @db.Integer
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([match_id, round_number, attacker_player_card_id])
+  @@index([attacker_player_card_id, round_number])
+  @@map("card_round_damage_events")
+}
+
+model CardDestroyEvent {
+  id                          String   @id @default(uuid()) @db.VarChar(36)
+  match_id                    String   @db.VarChar(36)
+  match_round_id              String?  @db.VarChar(36)
+  round_number                Int      @db.Integer
+  destroyed_player_card_id    String   @db.VarChar(36)
+  destroyed_by_player_card_id String?  @db.VarChar(36)
+  created_at                  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([match_id, round_number])
+  @@index([destroyed_player_card_id])
+  @@map("card_destroy_events")
+}
